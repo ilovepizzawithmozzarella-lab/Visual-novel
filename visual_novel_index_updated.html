@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Incontro clandestino — Demo</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#08090d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+#game{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden;background:#111}
+#scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#shade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(0,0,0,.78));pointer-events:none}
+#box{position:absolute;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));background:rgba(8,9,14,.91);border-radius:14px;padding:12px;z-index:2;max-height:47%;overflow:auto}
+#name{font-weight:800;color:#ffd6df;margin-bottom:6px}#text{font-size:15px;line-height:1.5;white-space:pre-line}
+#choices{display:grid;gap:8px;margin-top:11px}.choice{border:0;border-radius:10px;padding:11px;font-size:14px;font-weight:650;background:#f1f2f4;color:#1678c8;min-height:42px}
+#start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;background:rgba(0,0,0,.18)}
+#start button{border:0;border-radius:14px;padding:14px 22px;font-size:17px;font-weight:700;background:#f2f2f4;color:#147bd1}
+</style></head><body>
+<div id="game"><img id="scene" src="Intro%20.PNG"><div id="shade"></div><div id="box"><div id="name"></div><div id="text"></div><div id="choices"></div></div><div id="start"><button id="startButton">Inizia la demo</button></div></div>
+<script>
+const I={
+intro:"Intro%20.PNG",ring:"Ring.PNG",r2:"Inizio%202%20round.PNG",watch:"La%20ragazza%20vede%20il%20nostro%20stato.PNG",
+hit:"Colpo%20stordente%20.PNG",hitP:"Colpo%20stordente%20(provocatoria).PNG",stagger:"Svenimento.PNG",ko:"Ko.PNG",koP:"Ko%20(provocazione%20.PNG",
+count:"attesa%20conteggio%20timido.PNG",countP:"attesa%20conteggio%20provocatorio.PNG",winT:"vittoria%20finale%20timido.PNG",winP:"vittoria%20finale%20provocatorio.PNG",
+approach:"si%20avvicina%20finale%20timido.PNG",down:"guarda%20dall%27alto%20in%20basso%20finale%20provocatorio.PNG",footT:"piede%20timido.PNG",footP:"piede%20provocatorio.PNG",
+sitT:"seduta%20finale%20timido.PNG",sitP:"seduta%20finale%20provocatorio.PNG",selfT:"selfie%20timido.PNG",selfP:"selfie%20provocatorio.PNG",
+photoT1:"foto%20vittoria%20timido%201.PNG",photoT2:"foto%20vittoria%20timido%202.PNG",photoP:"foto%20vittoria%20provocatorio.PNG",
+exit:"uscita%20ring.PNG",stats:"statistiche%20incontro.PNG",phone:"epilogo%20telefono.PNG"};
+const s=document.getElementById("scene"),n=document.getElementById("name"),t=document.getElementById("text"),c=document.getElementById("choices"),start=document.getElementById("start");let prov=0;
+function show(i,name,text,ops=[]){s.src=I[i]||"";n.textContent=name;t.textContent=text;c.innerHTML="";ops.forEach(o=>{let b=document.createElement("button");b.className="choice";b.textContent=o[0];b.onclick=o[1];c.appendChild(b)})}
+function q(label,fn,d){return[label,()=>{prov+=d;fn()}]}
+function begin(){start.style.display="none";show("intro","Mika",`Il gong non è ancora suonato.
+
+Mika tiene i guantoni davanti al viso, cercando di sembrare più sicura di quanto sia davvero.
+
+È una ragazza normale, timida e senza esperienza nella boxe. È venuta qui per i soldi e solo dopo essere salita sul ring ha scoperto che il suo avversario è un pugile professionista.
+
+Io.
+
+Lei inspira lentamente. Io guardo la sua guardia e penso a quanto dovrebbe essere semplice controllare l’incontro.`,[
+q("La osservo senza darle indicazioni.",r1,1),q("Le lascio il tempo di prepararsi.",r1,1),q("Cerco subito di imporre il ritmo.",r1,-1)])}
+function r1(){show("ring","Luca",`Il gong suona. Mika fa un passo avanti, ancora rigida.
+
+«Va bene…» dice piano. «Cominciamo.»
+
+Il primo round passa tra scambi brevi. Io controllo il ritmo, ma noto che Mika osserva ogni movimento.
+
+*È una principiante. Non dovrebbe essere difficile.*`,[["Continua.",r2]])}
+function r2(){show("r2","Luca",`Il secondo round comincia. Il fiato è più pesante di quanto vorrei. Mika lo nota.
+
+*È una principiante. Non può essere lei a dettare il ritmo.*
+
+Faccio un passo. Lei ne fa uno anche lei.
+
+Per la prima volta non sono sicuro di chi stia inseguendo chi.`,[
+q("Prendo il centro e la costringo ad arretrare.",a,1),q("Aspetto che sia lei a venire avanti.",b,1),q("Cambio ritmo e provo a sorprenderla.",d,-1)])}
+function a(){show("watch","Mika",`Mika arretra, poi mi guarda meglio.
+
+«Sei stanco?»
+
+La domanda è quasi gentile. Non rispondo.
+
+*Non può averlo capito così facilmente.*
+
+Lei stringe i guantoni. Non sembra più soltanto intimorita. È curiosa.`,[["«Concentrati.»",middle],["Non rispondo.",middle],["«Non pensare di aver capito tutto.»",middle]])}
+function b(){show("watch","Mika",`Mika entra nella distanza e si ferma.
+
+«Prima eri molto più sicuro.»
+
+*Se n’è accorta.*
+
+È una frase innocua, ma mi pesa più di un colpo.`,[["«Ti stai illudendo.»",middle],["Sollevo la guardia.",middle],["«Continua a provare.»",middle]])}
+function d(){show("watch","Luca",`Cambio ritmo. Per un istante penso di averla sorpresa. Mika però arretra nel momento giusto.
+
+«Stavi cercando di farmi sbagliare?»
+
+*Il problema è che adesso sa che sono io quello preoccupato.*`,[["Riparto subito.",middle],["Mi fermo e osservo.",middle],["«Vieni avanti.»",middle]])}
+function middle(){show("watch","Mika",`Per qualche secondo nessuno parla. Mika mi osserva.
+
+«Sai cosa mi fa strano?»
+
+Fa un piccolo passo.
+
+«All’inizio pensavo che avrei dovuto soltanto cercare di non farmi colpire. Adesso invece sto iniziando a capire quando ti muovi.»
+
+*Una ragazza senza esperienza mi sta dicendo che mi ha studiato.*
+
+La cosa peggiore è che non posso nemmeno darle torto.`,[
+q("Le lascio l’iniziativa.",h1,1),q("Aspetto il suo errore.",h2,1),q("Entro prima che possa muoversi.",h3,-1)])}
+function h1(){show("hit","Mika",`Mika parte. Il colpo arriva più pulito di quanto mi aspettassi. Lo sento sulla guardia e arretrato di un passo.
+
+«Ti ho… fatto arretrare?»
+
+*Non devo lasciarle capire quanto mi abbia colpito.*`,[["Torno avanti.",after],["Mi chiudo.",after],["Cerco di non mostrare nulla.",after]])}
+function h2(){show("hit","Luca",`Aspetto il suo errore. La mia risposta arriva in ritardo. Il suo guantone mi raggiunge prima che possa completare il movimento.
+
+Il dolore è sopportabile. L’umiliazione molto meno.
+
+*Ho aspettato troppo davanti a una principiante.*`,[["Attacco subito.",after],["Arretro.",after],["Resto in guardia.",after]])}
+function h3(){show("hitP","Mika",`Entro prima che possa muoversi. Mika reagisce d’istinto. Il colpo mi raggiunge.
+
+Lei torna in guardia, sorpresa.
+
+«Scusa… non volevo sorprenderti così.»`,[["«Non scusarti.»",after],["Faccio un passo indietro.",after],["Torno avanti.",after]])}
+function after(){show("watch","Luca",`Il combattimento continua.
+
+Mi accorgo che sto pensando troppo a come tutto questo deve apparire. Un professionista che fatica contro una ragazza che, quando è salita sul ring, non sapeva nemmeno cosa aspettarsi.
+
+Mika acquisisce sicurezza ogni volta che mi costringe a reagire.
+
+*La cosa peggiore sarebbe lasciarle capire che sono in difficoltà.*`,[
+q("La provoco e la faccio avanzare.",la,1),q("Resto prudente e le lascio il dubbio.",lb,1),q("Provo a chiudere subito lo scambio.",lc,-1)])}
+function la(){show("hitP","Mika",`La provocazione funziona al contrario. Mika avanza e il suo pugno mi costringe a chiudermi.
+
+«Pensavi davvero che sarei scappata?»
+
+La sua voce è ancora un po’ tremante, ma dietro c’è una sicurezza che prima non c’era.`,[["Continuo.",endFight],["Cambio angolo.",endFight],["Resto fermo.",endFight]])}
+function lb(){show("watch","Mika",`Mika non attacca subito. Mi guarda.
+
+«Stai cercando di farmi sbagliare.»
+
+Non è una domanda.
+
+*Sta imparando durante il combattimento.*`,[["Avanzo.",endFight],["Aspetto.",endFight],["Cambio ritmo.",endFight]])}
+function lc(){show("hit","Mika",`Provo a chiudere lo scambio. Per un istante sembra funzionare. Poi Mika si sposta e mi colpisce di nuovo.
+
+Le gambe mi sembrano più pesanti.
+
+«Sei stanco davvero, vero?»
+
+Non riesco a risponderle.`,[["Continuo ad attaccare.",endFight],["Mi copro.",endFight],["Cerco spazio.",endFight]])}
+function endFight(){show("stagger","Luca",`Il respiro mi pesa nel petto. Cerco di rimettere insieme la guardia.
+
+Mika fa un passo avanti e si ferma.
+
+«Ehi… tutto bene?»
+
+La domanda è sincera. Ed è proprio questo a farmi male. Non voglio la sua compassione. Non voglio che una ragazza che fino a poco fa aveva paura di me mi guardi come se fossi io quello da rassicurare.
+
+*Non posso finire così.*
+
+Il gong sembra lontanissimo.`,[
+q("Gioco tutto sull’attacco.",win,-3),q("Aspetto il contrattacco.",lose,1),q("Provo soltanto a resistere.",lose,1)])}
+function win(){show("ring","Luca",`Trovo finalmente l’apertura. Entro nel momento giusto. Mika è costretta ad arretrare.
+
+La campanella suona.
+
+Per la demo, questo è il punto della nostra vittoria: non abbiamo ancora un’immagine della vittoria del protagonista.`,[["Continua.",statsWin]])}
+function lose(){show(prov>=3?"koP":"ko","Luca",`Il mio equilibrio sparisce.
+
+Il ring sembra inclinarsi. Cerco di restare in piedi, ma la coscienza si spegne.
+
+*Una principiante… mi ha portato fin qui.*`,[["Continua.",()=>prov>=3?provFinal:timidFinal]])}
+function timidFinal(){show("count","Mika",`Mika aspetta il conteggio. Non esulta. È quasi incredula.
+
+«L’ho davvero… battuto?»
+
+Quando il conteggio finisce, abbassa lentamente i guantoni.`,[["Continua.",twin]])}
+function provFinal(){show("countP","Mika",`Mika aspetta il conteggio senza distogliere gli occhi da me.
+
+Quando arriva l’ultimo numero sorride.
+
+«Quindi è finita davvero. E pensare che all’inizio avevo paura di te.»`,[["Continua.",pwin]])}
+function twin(){show("winT","Mika",`La vittoria sembra quasi imbarazzarla.
+
+«Non pensavo di riuscirci.»
+
+Il suo sorriso è piccolo e sincero. Non c’è voglia di umiliarmi. Solo la sorpresa di aver superato qualcosa che sembrava impossibile.`,[["Continua.",ta]])}
+function pwin(){show("winP","Mika",`Mika posa con una sicurezza che all’inizio non aveva.
+
+«Alla fine sei stato tu a cadere.»
+
+La frase è provocatoria, ma non urlata.`,[["Continua.",pa]])}
+function ta(){show("approach","Mika",`Mika si avvicina a noi. Si china appena.
+
+«Mi dispiace davvero. Ma… grazie. Senza questo incontro non avrei mai pensato di poter fare una cosa del genere.»`,[["Continua.",tf]])}
+function pa(){show("down","Mika",`Mika ci guarda dall’alto in basso.
+
+«La prossima volta dovresti stare più attento a chi consideri una principiante.»`,[["Continua.",pf]])}
+function tf(){show("footT","Mika",`Mika guarda la situazione ancora incredula.
+
+Non dice nulla per qualche secondo.`,[["Continua.",ts]])}
+function pf(){show("footP","Mika",`Mika mantiene quell’atteggiamento sicuro.
+
+«Non avrei mai immaginato che sarebbe finita così.»`,[["Continua.",ps]])}
+function ts(){show("sitT","Mika",`Mika si siede e ci guarda in silenzio.
+
+«Sei davvero un professionista… eppure sono stata io a vincere.»`,[["Continua.",selft]])}
+function ps(){show("sitP","Mika",`Mika si siede e continua a guardarci.
+
+«Stasera sei stato tu quello che non è riuscito a stare in piedi.»`,[["Continua.",selfp]])}
+function selft(){show("selfT","Mika",`Più tardi Mika scatta un selfie.
+
+Sorride in modo timido.
+
+«Ancora non ci credo…»`,[["Continua.",photo1]])}
+function selfp(){show("selfP","Mika",`Più tardi Mika scatta un selfie.
+
+Questa volta sorride senza nascondere la soddisfazione.
+
+«Questa me la voglio ricordare.»`,[["Continua.",photoP]])}
+function photo1(){show("photoT1","Mika",`Mika guarda la prima foto della vittoria. Poi ne scatta un’altra.
+
+«Forse questa la tengo.»`,[["Continua.",photo2]])}
+function photo2(){show("photoT2","Mika",`Nella seconda foto Mika sorride appena.
+
+È una vittoria che ancora non riesce a sentire del tutto sua.`,[["Continua.",exitScene]])}
+function photoP(){show("photoP","Mika",`Mika guarda la foto della vittoria e sorride.
+
+«Sì. Questa va bene.»`,[["Continua.",exitScene]])}
+function exitScene(){show("exit","Mika",`Mika esce dal ring.
+
+Per lei la serata non è ancora finita: continua a ripensare al momento in cui ha capito di poter vincere.`,[["Continua.",statsLose]])}
+function statsWin(){show("stats","Statistiche",`Statistiche dell’incontro.
+
+Vittoria di Luca.`,[["Fine demo",()=>{}]])}
+function statsLose(){show("stats","Statistiche",`Statistiche dell’incontro.
+
+Vittoria di Mika.`,[["Continua.",phone]])}
+function phone(){show("phone","Mika",`A casa, Mika è al telefono con la sua amica.
+
+«Non ci crederai mai. Ho davvero vinto.»
+
+Ascolta la risposta e ride piano.
+
+«Sì, lo so… sembra assurdo anche a me.»
+
+«All’inizio avevo una paura tremenda. Poi però ho capito che potevo farcela.»`,[["Continua.",hospital]])}
+function hospital(){show("","",`Quando riapro gli occhi, vedo un soffitto bianco.
+
+Per qualche secondo non ricordo dove sono. Poi tornano alla mente il ring, il gong e l’ultimo colpo.
+
+Sono in ospedale.
+
+La parte più difficile non è il dolore. È ricordare contro chi ho perso.
+
+Una principiante.
+
+Una ragazza che era salita sul ring senza esperienza e che, alla fine, era rimasta in piedi mentre io non riuscivo più a farlo.
+
+*Non dimenticherò facilmente questa notte.*
+
+FINE DEMO — SCONFITTA`,[["Ricomincia",()=>location.reload()]])}
+startButton.onclick=begin;show("intro","","");
+</script></body></html>

@@ -2,39 +2,55 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Incontro clandestino - Demo</title>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;background:#111;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
-#game{position:relative;width:100%;height:100%;max-width:900px;margin:auto;overflow:hidden;background:#111}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;background:#08090d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden;touch-action:manipulation}
+#game{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden;background:#111}
 #scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-#shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05) 45%,rgba(0,0,0,.72) 100%);pointer-events:none}
-#box{position:absolute;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));background:rgba(10,10,16,.88);border-radius:14px;padding:11px 12px;z-index:2;box-shadow:0 5px 24px rgba(0,0,0,.25);max-height:43%;overflow:auto}
+#shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.02) 45%,rgba(0,0,0,.62) 100%);pointer-events:none}
+#box{position:absolute;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));background:rgba(8,9,14,.88);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 13px;z-index:2;box-shadow:0 5px 24px rgba(0,0,0,.28);max-height:31%;overflow:auto;backdrop-filter:blur(5px)}
 #box.hidden{display:none}
-#name{font-weight:700;color:#ffd4df;margin-bottom:4px;font-size:15px}
-#text{font-size:15px;line-height:1.35;min-height:0}
+#name{font-weight:750;color:#ffd6df;margin-bottom:5px;font-size:15px}
+#name.thought{color:#bcdcff;font-style:italic}
+#text{font-size:15px;line-height:1.38}
 #choices{display:grid;gap:7px;margin-top:9px}
-.choice{border:0;border-radius:10px;padding:10px 11px;font-size:14px;font-weight:650;background:#f2f2f4;color:#171717;min-height:42px}
-.choice:active{transform:scale(.98)}
-#start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;background:rgba(0,0,0,.22)}
+.choice{width:100%;border:0;border-radius:10px;padding:10px 11px;font-size:14px;font-weight:650;background:#f1f2f4;color:#1678c8;min-height:42px}
+.choice:active{transform:scale(.98);background:#ddd}
+#continue{display:block;margin:8px 0 0 auto;border:0;background:transparent;color:#aaa;font-size:12px;padding:2px 0}
+#round{position:absolute;top:12px;left:12px;z-index:3;padding:6px 9px;border-radius:8px;background:rgba(0,0,0,.48);font-size:11px;font-weight:700;display:none}
+#start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;background:rgba(0,0,0,.12)}
 #start.hidden{display:none;pointer-events:none}
 #start button{border:0;border-radius:14px;padding:14px 22px;font-size:17px;font-weight:700;background:#f2f2f4;color:#147bd1;box-shadow:0 4px 18px rgba(0,0,0,.2)}
+@media(max-height:650px){#box{max-height:35%;padding:9px 11px}#text{font-size:14px}.choice{min-height:38px;padding:8px 10px}}
 </style>
 </head>
 <body>
 <div id="game">
 <img id="scene" src="Intro%20.PNG" alt="">
 <div id="shade"></div>
+<div id="round">ROUND 1</div>
 <div id="box" class="hidden">
 <div id="name"></div>
 <div id="text"></div>
 <div id="choices"></div>
+<button id="continue" type="button">Tocca per continuare ▶</button>
 </div>
 <div id="start"><button id="startButton" type="button">Inizia la demo</button></div>
 </div>
 <script>
-const imgs={intro:"Intro%20.PNG",ring:"Ring.PNG",gloves:"Gloves.PNG"};
+const imgs={
+ intro:'Intro%20.PNG',
+ idle:'Idle.PNG',
+ attack1:'Attacco%201.PNG',
+ attack2:'Attacco%202.PNG',
+ attack3:'Attacco%203.PNG',
+ uppercut:'Montante%20.PNG',
+ down:'A%20terra%20.PNG',
+ getup:'Rialzato.PNG',
+ pause:'Pausa.PNG'
+};
 const scene=document.getElementById('scene');
 const nameEl=document.getElementById('name');
 const textEl=document.getElementById('text');
@@ -42,36 +58,95 @@ const choicesEl=document.getElementById('choices');
 const box=document.getElementById('box');
 const start=document.getElementById('start');
 const startButton=document.getElementById('startButton');
+const continueBtn=document.getElementById('continue');
+const roundEl=document.getElementById('round');
 
-function show(img,n,t,cs){
- scene.src=imgs[img];
- nameEl.textContent=n;
- textEl.textContent=t;
+let index=0;
+let provocation=0;
+let playerAdvantage=0;
+let knockedDown=false;
+
+const story=[
+ {img:'intro',speaker:'Lei',text:'Non avrei mai pensato di finire in un posto del genere… Mi hanno detto che avrei guadagnato abbastanza soldi. Però nessuno mi aveva detto chi avrei dovuto affrontare.',choices:[['«Sei sicura di volerlo fare?»',1],['«È davvero un incontro clandestino?»',2]]},
+ {img:'intro',speaker:'Lei',text:'«S-sì… ho bisogno di quei soldi. Non sono mai stata in un ambiente del genere, ma voglio provarci.»',next:3},
+ {img:'intro',speaker:'Lei',text:'«Sì… almeno così mi hanno detto.» Deglutisce nervosamente. «Pensavo fosse una cosa molto più semplice…»',next:3},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Salgo sul ring. Sono un professionista. Non posso permettermi di sottovalutare un incontro clandestino, anche se lei sembra completamente fuori posto.',next:4},
+ {img:'idle',speaker:'Lei',text:'E-ehi… possiamo iniziare quando vuoi. Cercherò di fare del mio meglio.',choices:[['«Ti prenderò sul serio.»',5],['«Non durerai molto contro un professionista.»',6],['«Sei ancora in tempo per tirarti indietro.»',7]]},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'La sua voce trema, ma la guardia è abbastanza ordinata. Forse dietro quella timidezza c’è più determinazione di quanto sembri.',next:8},
+ {img:'idle',speaker:'Lei',text:'«Un professionista… lo so. Ma non mi tirerò indietro.»',next:8,prov:1},
+ {img:'idle',speaker:'Lei',text:'«N-no… non posso tirarmi indietro adesso.» Stringe i guantoni più forte.',next:8},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Il gong sta per suonare. Da questo momento non è più una semplice conversazione.',next:9},
+ {img:'idle',speaker:'Lei',text:'…',choices:[['Attacca',10],['Para e studiala',11],['Schiva e aspetta',12]]},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Parto per primo. Non ho ancora le immagini del mio attacco, quindi mi limito a rappresentare il mio movimento con la posizione di guardia.',next:13},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Resto compatto e osservo. Voglio capire il suo ritmo prima di rischiare uno scambio.',next:13},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Mi preparo a reagire. Se entra troppo scoperta, avrò la possibilità di contrattaccare.',next:13},
+ {img:'idle',speaker:'Lei',text:'Allora… tocca a me.',choices:[['Schiva',14],['Para',15],['Attacca mentre avanza',16]]},
+ {img:'attack1',speaker:'Pensiero',thought:true,text:'Mi sposto di lato. Il suo pugno passa davanti a me. La sua velocità è migliore di quanto mi aspettassi.',next:17,adv:1},
+ {img:'attack2',speaker:'Pensiero',thought:true,text:'Alzo la guardia e blocco il colpo. L’impatto è netto, ma non mi fa arretrare.',next:17,adv:1},
+ {img:'attack3',speaker:'Pensiero',thought:true,text:'Provo a interrompere il suo ingresso. Lei evita il mio pugno e riesce comunque a farmi arretrare di mezzo passo.',next:17,adv:-1},
+ {img:'idle',speaker:'Lei',text:'S-scusa… non volevo colpirti così forte.',choices:[['«Non scusarti. Continua.»',18],['«Non male per una principiante.»',19],['«Sei ancora troppo lenta.»',20]]},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'La sua timidezza non mi deve ingannare. Sta imparando durante lo stesso incontro.',next:21},
+ {img:'idle',speaker:'Lei',text:'«Principiante… sì. Ma non significa che sia facile battermi.»',next:21,prov:1},
+ {img:'idle',speaker:'Lei',text:'…',next:21,prov:2},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Le mie parole la colpiscono più del pugno. Se continuo a provocarla, potrebbe cambiare atteggiamento.',next:22},
+ {img:'idle',speaker:'Lei',text:'Stavolta non aspetterò.',choices:[['Schiva',23],['Para',24],['Attacca prima di lei',25]]},
+ {img:'attack2',speaker:'Pensiero',thought:true,text:'Schivo appena in tempo. Il suo guantone sfiora il mio.',next:26,adv:1},
+ {img:'attack3',speaker:'Pensiero',thought:true,text:'Chiudo la guardia. Il colpo arriva, ma riesco a bloccarlo.',next:26,adv:1},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Parto prima. Lei si sposta e il mio attacco va a vuoto. Ora siamo di nuovo faccia a faccia.',next:26,adv:-1},
+ {img:'idle',speaker:'Lei',text:'Sei davvero bravo… ma non voglio arrendermi.',next:27},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Il ritmo aumenta. Nessuno dei due ha ancora il controllo completo del round.',next:28},
+ {img:'uppercut',speaker:'Lei',text:'Attento!',choices:[['Para il montante',29],['Schiva all’indietro',30],['Resta dentro e attacca',31]]},
+ {img:'uppercut',speaker:'Pensiero',thought:true,text:'Chiudo subito la guardia. Il montante colpisce i miei guantoni invece del volto. Assorbo l’impatto.',next:32,adv:1},
+ {img:'attack2',speaker:'Pensiero',thought:true,text:'Arretro di un passo. Il montante passa davanti a me senza prendermi in pieno.',next:32,adv:1},
+ {img:'uppercut',speaker:'Pensiero',thought:true,text:'Resto nello scambio. È rischioso, ma voglio impedire che prenda fiducia.',next:33,adv:-1},
+ {img:'idle',speaker:'Lei',text:'H-hai resistito…',next:34},
+ {img:'uppercut',speaker:'Lei',text:'Ti ho preso!',next:35},
+ {img:'down',speaker:'Pensiero',thought:true,text:'Il colpo mi sorprende. Per un istante perdo l’equilibrio e finisco a terra.',next:36,down:true},
+ {img:'down',speaker:'Lei',text:'Oh no! Stai bene? Rialzati…',next:37},
+ {img:'getup',speaker:'Pensiero',thought:true,text:'Non posso restare a terra. Sono un professionista. Rialzarmi non è un’opzione: è un obbligo.',next:38},
+ {img:'getup',speaker:'Lei',text:'Sei riuscito a rialzarti…',next:39},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Torno in guardia. Il fatto di essere stato messo a terra mi pesa, ma il round non è ancora finito.',next:40},
+ {img:'idle',speaker:'Lei',text:'Manca poco alla campanella. Posso ancora continuare.',choices:[['Pressa e cerca di chiudere bene il round',41],['Difenditi fino alla campanella',42],['Provocala ancora',43]]},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Avanzo con decisione. Voglio recuperare il controllo prima della fine del round.',next:44,adv:1},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Resto composto. Dopo quella caduta non posso permettermi un’altra apertura.',next:44,adv:1},
+ {img:'idle',speaker:'Lei',text:'«Ancora mi provochi…?» Per la prima volta il suo sguardo sembra più deciso.',next:44,prov:2},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Il gong è vicino. Il primo round è stato molto più difficile di quanto avessi previsto.',next:45},
+ {img:'idle',speaker:'Lei',text:'«Posso continuare. Nel prossimo round farò ancora meglio.»',next:46},
+ {img:'idle',speaker:'Pensiero',thought:true,text:'Fine del Round 1. Lei è ancora timida, ma qualcosa nel suo atteggiamento è cambiato. Le mie scelte determineranno quanto cambierà dal secondo round.',next:47},
+ {img:'idle',speaker:'Sistema',text:'FINE DEMO — Round 1. Il secondo round e i tre finali verranno collegati nella prossima versione.',choices:[['Ricomincia la demo',()=>location.reload()]]}
+];
+
+function render(i){
+ index=i;
+ const s=story[i];
+ scene.src=imgs[s.img];
+ nameEl.textContent=s.speaker;
+ nameEl.className=s.thought?'thought':'';
+ textEl.textContent=s.text;
  choicesEl.innerHTML='';
- cs.forEach(([label,action])=>{
-  const b=document.createElement('button');
-  b.className='choice';
-  b.type='button';
-  b.textContent=label;
-  b.addEventListener('click',action);
-  choicesEl.appendChild(b);
- });
  box.classList.remove('hidden');
+ roundEl.style.display=s.img==='intro'?'none':'block';
+ continueBtn.style.display='none';
+ if(s.prov) provocation+=s.prov;
+ if(s.adv) playerAdvantage+=s.adv;
+ if(s.down) knockedDown=true;
+ if(s.choices){
+   s.choices.forEach(([label,target])=>{
+     const b=document.createElement('button');
+     b.className='choice'; b.type='button'; b.textContent=label;
+     b.addEventListener('click',()=>{
+       if(typeof target==='function'){target();return;}
+       render(target);
+     });
+     choicesEl.appendChild(b);
+   });
+ }else if(s.next!==undefined){
+   continueBtn.style.display='block';
+   continueBtn.onclick=()=>render(s.next);
+ }
 }
 
-function begin(){
- start.classList.add('hidden');
- show('intro','Lei','Non avrei mai pensato di finire in un posto del genere… Mi hanno detto che avrei guadagnato abbastanza soldi. Però nessuno mi aveva detto chi avrei dovuto affrontare.',[
- ['«Sei sicura di volerlo fare?»',a],
- ['«È davvero un incontro clandestino?»',b]
- ]);
-}
-function a(){show('ring','Lei','Lei abbassa lo sguardo. «S-sì… ho bisogno di quei soldi. Non sono mai stata in un ring, ma proverò a non tirarmi indietro.»',[['Salire sul ring',c]])}
-function b(){show('ring','Lei','«Sì… almeno così mi hanno detto.» Deglutisce nervosamente mentre sale sul ring. «Pensavo fosse una cosa molto più semplice…»',[['Salire sul ring',c]])}
-function c(){show('gloves','Lei','Quando i due avversari si avvicinano per il saluto iniziale, lei fa toccare i guantoni. Poi sente finalmente l’annuncio: il suo avversario è un pugile maschio professionista.',[['«Aspetta… professionista?!»',d],['Restare in silenzio e prepararsi',d]])}
-function d(){show('gloves','Lei','Il suo viso cambia. «N-non lo sapevo…» Le mani le tremano appena. Poi guarda il premio in denaro e stringe i guantoni.',[['«Non puoi più tirarti indietro.»',e],['«Possiamo parlare con l’organizzatore.»',f]])}
-function e(){show('gloves','Lei','Lei prende un respiro profondo. «Hai ragione… Sono venuta qui per i soldi. Farò del mio meglio.» La campanella sta per suonare.',[['Fine demo',()=>location.reload()]])}
-function f(){show('gloves','Lei','Lei annuisce. «Grazie… ma credo che ormai non cambierà nulla.» Si mette in guardia. La campanella sta per suonare.',[['Fine demo',()=>location.reload()]])}
+function begin(){start.classList.add('hidden');render(0)}
 startButton.addEventListener('click',begin);
 </script>
 </body>

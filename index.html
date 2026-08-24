@@ -10,10 +10,10 @@ html,body{margin:0;width:100%;height:100%;background:#08090d;color:#fff;font-fam
 #game{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden;background:#111}
 #scene{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 #shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.02) 45%,rgba(0,0,0,.62) 100%);pointer-events:none}
-#box{position:absolute;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));background:rgba(8,9,14,.88);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 13px;z-index:2;box-shadow:0 5px 24px rgba(0,0,0,.28);max-height:34%;overflow:auto;backdrop-filter:blur(5px)}
+#box{position:absolute;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));background:rgba(8,9,14,.88);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 13px;z-index:2;box-shadow:0 5px 24px rgba(0,0,0,.28);max-height:38%;overflow:auto;backdrop-filter:blur(5px)}
 #box.hidden{display:none}
 #name{font-weight:750;color:#ffd6df;margin-bottom:5px;font-size:15px}
-#text{font-size:15px;line-height:1.42}
+#text{font-size:15px;line-height:1.42;white-space:pre-line}
 #choices{display:grid;gap:7px;margin-top:9px}
 .choice{width:100%;border:0;border-radius:10px;padding:10px 11px;font-size:14px;font-weight:650;background:#f1f2f4;color:#1678c8;min-height:42px}
 .choice:active{transform:scale(.98);background:#ddd}
@@ -22,7 +22,7 @@ html,body{margin:0;width:100%;height:100%;background:#08090d;color:#fff;font-fam
 #start{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;background:rgba(0,0,0,.12)}
 #start.hidden{display:none;pointer-events:none}
 #start button{border:0;border-radius:14px;padding:14px 22px;font-size:17px;font-weight:700;background:#f2f2f4;color:#147bd1;box-shadow:0 4px 18px rgba(0,0,0,.2)}
-@media(max-height:650px){#box{max-height:38%;padding:9px 11px}#text{font-size:14px}.choice{min-height:38px;padding:8px 10px}}
+@media(max-height:650px){#box{max-height:42%;padding:9px 11px}#text{font-size:14px}.choice{min-height:38px;padding:8px 10px}}
 </style>
 </head>
 <body>
@@ -36,7 +36,7 @@ html,body{margin:0;width:100%;height:100%;background:#08090d;color:#fff;font-fam
 <div id="choices"></div>
 <button id="continue" type="button">Tocca per continuare ▶</button>
 </div>
-<div id="start"><button id="startButton" type="button">Inizia la demo</button></div>
+<div id="start"><button id="startButton" type="button">Inizia</button></div>
 </div>
 <script>
 const imgs={
@@ -50,6 +50,7 @@ const imgs={
  getup:'Rialzato.PNG',
  pause:'Pausa.PNG'
 };
+
 const scene=document.getElementById('scene');
 const nameEl=document.getElementById('name');
 const textEl=document.getElementById('text');
@@ -60,59 +61,60 @@ const startButton=document.getElementById('startButton');
 const continueBtn=document.getElementById('continue');
 const roundEl=document.getElementById('round');
 
-let index=0;
-
 const story=[
- {img:'intro',speaker:'Mika',text:'Mika aveva diciannove anni e conduceva una vita piuttosto normale. Studiava, faceva qualche lavoretto quando capitava e cercava di mettere da parte abbastanza soldi per andare a vivere da sola. Non aveva mai avuto a che fare con la boxe, se non per qualche incontro visto in televisione. Quel pomeriggio, però, aveva accettato un lavoro molto diverso dal solito: un incontro clandestino pagato in contanti.' ,next:1},
- {img:'intro',speaker:'Mika',text:'Non era stata una sua idea. Un conoscente le aveva parlato di quella palestra e della possibilità di guadagnare una somma che, per lei, faceva davvero la differenza. Mika aveva accettato pensando che avrebbe affrontato una ragazza della sua stessa esperienza. Solo dopo essere arrivata aveva scoperto la verità.',next:2},
- {img:'intro',speaker:'Mika',text:'«Mi avevano detto che avrei combattuto contro qualcuno alla mia portata…» Mika abbassa lo sguardo sui guantoni appena indossati. «Ormai sono qui. Se torno indietro senza nemmeno provarci, non mi pagheranno.»',choices:[['«Sei sicura di voler salire sul ring?»',3],['«Ti avevano detto chi avresti affrontato?»',4]]},
- {img:'intro',speaker:'Mika',text:'Mika solleva gli occhi verso di me. «No. Ma ho già accettato i soldi e ne ho bisogno. Non voglio tirarmi indietro adesso.»',next:5},
- {img:'intro',speaker:'Mika',text:'«No. Quando ho chiesto, mi hanno solo detto che sarebbe stato un incontro semplice.» Mika si guarda intorno, poi torna a fissarmi. «Se avessi saputo prima che eri un professionista, forse ci avrei pensato due volte.»',next:5},
- {img:'idle',speaker:'Luca',text:'La guardo mentre sistema i guantoni. È evidente che non è abituata a stare su un ring. Io, al contrario, combatto da anni e so bene quanto possa essere pericoloso sottovalutare qualcuno solo perché sembra inesperto.',next:6},
- {img:'idle',speaker:'Mika',text:'«Ehi… non pensare che mi arrenderò appena suona il gong. So che sei più esperto di me, ma sono venuta qui per combattere.»',choices:[['«Ti prenderò sul serio.»',7],['«Non durerai molto contro un professionista.»',8],['«Sei ancora in tempo per tirarti indietro.»',9]]},
- {img:'idle',speaker:'Luca',text:'«Va bene. Allora facciamo sul serio.» Le rivolgo un cenno e torno in guardia.',next:10},
- {img:'idle',speaker:'Mika',text:'Mika stringe i guantoni. «Lo so. Ma non sono venuta qui per chiederti di andarci piano.»',next:10},
- {img:'idle',speaker:'Mika',text:'«No.» Mika fa un respiro profondo. «Non dopo essere arrivata fin qui.»',next:10},
- {img:'idle',speaker:'Luca',text:'Il gong suona. Mika alza immediatamente la guardia e fa un piccolo passo in avanti.',next:11},
- {img:'idle',speaker:'Mika',text:'Mika si muove con cautela, cercando di capire la distanza tra noi.',choices:[['Attacca per primo',12],['Resta in guardia e osserva',13],['Lascia che sia Mika ad avvicinarsi',14]]},
- {img:'attack1',speaker:'Luca',text:'Faccio un passo avanti e provo a colpire prima che possa prendere posizione. Mika arretra appena in tempo e il mio pugno passa davanti alla sua guardia.',next:15},
- {img:'idle',speaker:'Luca',text:'Resto fermo e osservo i suoi movimenti. Mika avanza lentamente, senza scoprirsi troppo.',next:15},
- {img:'attack2',speaker:'Luca',text:'Aspetto che Mika entri nella mia distanza. Quando si avvicina, alzo la guardia e preparo la risposta.',next:15},
- {img:'idle',speaker:'Mika',text:'«Sei veloce…» Mika fa un passo di lato e torna subito in posizione.',choices:[['«Non avere fretta.»',16],['«Devi muoverti più velocemente.»',17],['«Continua così.»',18]]},
- {img:'idle',speaker:'Mika',text:'«Ci proverò.» Mika annuisce e riprende a muoversi intorno a me.',next:19},
- {img:'idle',speaker:'Mika',text:'«Lo so.» Mika inspira lentamente. «Sto cercando di capire come muovermi.»',next:19},
- {img:'idle',speaker:'Mika',text:'«Va bene.» Mika resta concentrata e solleva di nuovo la guardia.',next:19},
- {img:'idle',speaker:'Luca',text:'Mika continua a girare sul ring. Non ha la tecnica di un pugile esperto, ma non lascia cadere la guardia e cerca di non farsi chiudere all’angolo.',next:20},
- {img:'attack3',speaker:'Mika',text:'Mika parte all’improvviso con un diretto. Mi sposto di lato e il colpo sfiora il guantone.',choices:[['Schiva e cerca una risposta',21],['Chiudi la guardia',22],['Prova a colpirla mentre avanza',23]]},
- {img:'attack2',speaker:'Luca',text:'Mi sposto di lato e lascio passare il pugno. Appena Mika si gira verso di me, provo a rispondere.',next:24},
- {img:'attack2',speaker:'Luca',text:'Alzo entrambi i guantoni. Il suo pugno arriva sulla guardia e Mika torna subito indietro.',next:24},
- {img:'attack3',speaker:'Luca',text:'Provo a fermarla mentre entra. Mika riesce a evitare il colpo, ma deve arretrare per non perdere l’equilibrio.',next:24},
- {img:'idle',speaker:'Mika',text:'«Ci sono andata vicino…» Mika sorride appena, poi torna seria. «Riproverò.»',next:25},
- {img:'idle',speaker:'Luca',text:'Il ritmo aumenta. Mika continua a cercare un’apertura, mentre io cerco di non concederle spazio.',next:26},
- {img:'idle',speaker:'Mika',text:'«Stavolta non ti lascio il tempo di prepararti.» Mika avanza e porta il peso sulla gamba anteriore.',next:27},
- {img:'uppercut',speaker:'Mika',text:'Mika abbassa leggermente il corpo e parte con un montante.',choices:[['Chiudi la guardia',28],['Schiva all’indietro',29],['Resta vicino e prova a interromperla',30]]},
- {img:'uppercut',speaker:'Luca',text:'Chiudo la guardia appena in tempo. Il montante finisce sui guantoni e mi costringe comunque a fare un passo indietro.',next:31},
- {img:'attack2',speaker:'Luca',text:'Arretro rapidamente. Il guantone di Mika passa davanti a me senza colpirmi in pieno.',next:31},
- {img:'uppercut',speaker:'Luca',text:'Resto dentro lo scambio e provo a interrompere il movimento prima che possa completare il montante.',next:31},
- {img:'idle',speaker:'Mika',text:'Mika riprende fiato e sistema la guardia. «Non è facile, eh?»',next:32},
- {img:'uppercut',speaker:'Mika',text:'«Questa volta ti ho preso!» Il montante arriva prima che riesca a spostarmi completamente.',next:33},
- {img:'down',speaker:'Luca',text:'Il colpo mi sorprende. Perdo l’equilibrio e finisco a terra. Per qualche secondo sento soltanto il rumore della palestra.',next:34},
- {img:'down',speaker:'Mika',text:'Mika fa subito un passo verso di me, preoccupata. «Stai bene? Puoi rialzarti?»',next:35},
- {img:'getup',speaker:'Luca',text:'Appoggio una mano a terra e mi rialzo. Il gong non è ancora suonato.',next:36},
- {img:'getup',speaker:'Mika',text:'«Sei riuscito a rialzarti.» Mika torna in posizione e aspetta che io sia pronto.',next:37},
- {img:'idle',speaker:'Luca',text:'Torno in guardia. Il round è ancora aperto e non voglio lasciare a Mika il tempo di prendere il controllo.',next:38},
- {img:'idle',speaker:'Mika',text:'«Manca poco alla campanella.» Mika si asciuga la fronte con il guantone. «Posso ancora giocarmela.»',choices:[['Avanza e prova a chiudere bene il round',39],['Resta sulla difensiva fino alla campanella',40],['«Non pensare di aver già vinto.»',41]]},
- {img:'attack1',speaker:'Luca',text:'Avanzo e provo a riprendere il centro del ring. Mika arretra di un passo, poi torna subito avanti.',next:42},
- {img:'idle',speaker:'Luca',text:'Tengo la guardia alta e aspetto. Dopo essere finito a terra non voglio rischiare un altro colpo inutile.',next:42},
- {img:'idle',speaker:'Mika',text:'Mika mi guarda per un istante. «Non lo penso. Ma adesso so che posso metterti in difficoltà.»',next:42},
- {img:'idle',speaker:'Luca',text:'Il gong suona. Il primo round è finito. Mika abbassa lentamente i guantoni e torna verso il suo angolo.',next:43},
- {img:'idle',speaker:'Mika',text:'Mika prende fiato, ancora sorpresa di essere riuscita a reggere il primo round. «Nel prossimo round voglio fare meglio.»',next:44},
- {img:'idle',speaker:'Luca',text:'Resto qualche secondo in silenzio nel mio angolo. Quel montante mi ha ricordato che questo incontro non sarà così semplice come pensavo.',next:45},
- {img:'pause',speaker:'Luca',text:'La campanella del secondo round è ancora lontana. Abbiamo entrambi qualche minuto per riprendere fiato.',choices:[['Continua la demo',()=>location.reload()]]}
+{img:'intro',speaker:'Mika',text:'Mika aveva vent’anni e, fino a quel giorno, la boxe non aveva mai fatto parte della sua vita. Studiava durante la settimana e nei fine settimana lavorava qualche ora in un piccolo bar. Non guadagnava molto, ma quei soldi le servivano per contribuire alle spese di casa e mettere da parte qualcosa per il futuro.',next:1},
+{img:'intro',speaker:'Mika',text:'Qualche giorno prima, un conoscente le aveva parlato di un incontro privato in una palestra fuori mano. Le aveva promesso una somma molto più alta di quella che riusciva a mettere insieme in un mese di lavoro. Mika aveva accettato quasi subito. Le avevano detto che sarebbe stato un incontro semplice, contro un altro dilettante, e che non avrebbe avuto nulla da temere.',next:2},
+{img:'intro',speaker:'Mika',text:'Quando era arrivata, però, aveva capito che qualcosa non tornava. La palestra era quasi vuota e le persone intorno al ring parlavano a bassa voce. Poi aveva scoperto chi sarebbe stato il suo avversario: Luca, un pugile professionista che combatteva da anni.',next:3},
+{img:'intro',speaker:'Mika',text:'Mika rimase per qualche secondo a fissare il ring. Aveva ancora la possibilità di andarsene, ma sapeva anche cosa avrebbe significato rinunciare a quei soldi. Inspirò lentamente e si sistemò i guantoni.',choices:[['«Puoi ancora cambiare idea.»',4],['«Ti avevano detto che avresti affrontato un professionista?»',5]]},
+{img:'intro',speaker:'Mika',text:'«Lo so.» Mika abbassò lo sguardo sui guantoni. «Ma se me ne vado adesso perdo il compenso. E quei soldi mi servono davvero. Non sono venuta qui per fare la coraggiosa, voglio solo riuscire a portare a casa quello che mi hanno promesso.»',next:6},
+{img:'intro',speaker:'Mika',text:'«No. Mi avevano detto soltanto che sarebbe stato un incontro alla mia portata.» Mika fece una piccola pausa. «Se avessi saputo che eri un professionista, probabilmente avrei avuto paura ancora prima di arrivare qui.»',next:6},
+{img:'idle',speaker:'Luca',text:'La osservai mentre sistemava la chiusura dei guantoni. Era evidente che non aveva l’esperienza di chi sale sul ring da anni. Nonostante questo, non sembrava voler scappare.',next:7},
+{img:'idle',speaker:'Mika',text:'«Non ho intenzione di fingere di essere brava.» Mika alzò la guardia. «So che sei molto più esperto di me. Però sono qui e voglio almeno provarci.»',choices:[['«Allora combatterò seriamente.»',8],['«Non devi dimostrarmi niente.»',9],['«Sei sicura di riuscire a reggere?»',10]]},
+{img:'idle',speaker:'Luca',text:'«Va bene.» Mi misi in guardia. «Allora non farò finta che sia un allenamento.»',next:11},
+{img:'idle',speaker:'Mika',text:'Mika mi guardò per un istante, poi annuì. «È quello che voglio. Preferisco sapere subito quanto è difficile.»',next:11},
+{img:'idle',speaker:'Mika',text:'Mika strinse i guantoni. «Non lo so. Ma lo scoprirò sul ring.»',next:11},
+{img:'idle',speaker:'Luca',text:'Il gong suonò. Mika sollevò subito la guardia e fece un passo avanti, cercando di non mostrare quanto fosse nervosa.',next:12},
+{img:'idle',speaker:'Mika',text:'Mika si mosse lentamente, osservando la distanza. Non aveva ancora trovato il coraggio di attaccare per prima.',choices:[['Entrare subito e attaccare',13],['Aspettare e studiare i suoi movimenti',14],['Lasciare che sia Mika a fare la prima mossa',15]]},
+{img:'attack1',speaker:'Luca',text:'Entrai nella sua distanza e provai a colpire prima che potesse sistemarsi. Mika arretrò appena in tempo e il pugno passò davanti alla sua guardia.',next:16},
+{img:'idle',speaker:'Luca',text:'Rimasi in guardia e osservai i suoi piedi. Mika avanzò con cautela, facendo attenzione a non scoprirsi.',next:16},
+{img:'idle',speaker:'Luca',text:'Rimasi fermo. Mika esitò per un momento, poi decise di avvicinarsi. Il suo primo passo fu prudente, quasi come se stesse ancora cercando di capire quanto fosse grande la distanza tra noi.',next:16},
+{img:'idle',speaker:'Mika',text:'«Sei veloce.» Mika fece un passo di lato e tornò in guardia. «Devo ancora abituarmi alla distanza.»',choices:[['«Prenditi il tempo che ti serve.»',17],['«Non pensare troppo. Muoviti.»',18],['«Continua a osservare.»',19]]},
+{img:'idle',speaker:'Mika',text:'«Va bene.» Mika respirò più lentamente e riprese a muoversi intorno a me.',next:20},
+{img:'idle',speaker:'Mika',text:'«Ci sto provando.» Mika strinse la mascella e fece un altro passo avanti.',next:20},
+{img:'idle',speaker:'Mika',text:'Mika annuì senza rispondere. Continuò a seguire i miei movimenti con lo sguardo.',next:20},
+{img:'idle',speaker:'Luca',text:'Mika continuò a girare sul ring. Non aveva una tecnica raffinata, ma stava imparando a non incrociare i piedi e teneva la guardia abbastanza alta.',next:21},
+{img:'attack3',speaker:'Mika',text:'All’improvviso Mika avanzò con un diretto. Mi spostai di lato e il suo guantone sfiorò la mia guardia.',choices:[['Spostati e rispondi subito',22],['Chiudi la guardia e aspetta',23],['Prova a fermarla mentre entra',24]]},
+{img:'attack2',speaker:'Luca',text:'Mi spostai di lato. Mika dovette girarsi per seguirmi e in quel momento provai a rispondere con un colpo rapido.',next:25},
+{img:'attack2',speaker:'Luca',text:'Alzai la guardia e lasciai che il suo pugno finisse sui guantoni. Mika arretrò subito, senza esporsi a una risposta.',next:25},
+{img:'attack3',speaker:'Luca',text:'Provai a interrompere il suo ingresso. Mika evitò il colpo e fu costretta a fare un passo indietro.',next:25},
+{img:'idle',speaker:'Mika',text:'«Ci sono andata vicina.» Mika sorrise appena, ancora sorpresa di essere riuscita ad avvicinarsi così tanto. «La prossima volta non sbaglierò la distanza.»',next:26},
+{img:'idle',speaker:'Luca',text:'La campanella era ancora lontana. Mika aveva iniziato a prendere confidenza con il ring e io non potevo più considerarla soltanto una ragazza inesperta capitata lì per caso.',next:27},
+{img:'idle',speaker:'Mika',text:'«Adesso ho capito una cosa.» Mika avanzò lentamente. «Se continuo ad aspettare, finirò per passare tutto il round a difendermi.»',next:28},
+{img:'uppercut',speaker:'Mika',text:'Mika abbassò leggermente il corpo e partì con un montante.',choices:[['Chiudi la guardia',29],['Arretra e schiva',30],['Resta vicino e prova a interrompere il colpo',31]]},
+{img:'uppercut',speaker:'Luca',text:'Chiusi la guardia appena in tempo. Il montante colpì i guantoni e mi costrinse comunque a fare un passo indietro.',next:32},
+{img:'attack2',speaker:'Luca',text:'Arretrai rapidamente. Il guantone di Mika passò davanti a me senza colpirmi in pieno.',next:32},
+{img:'uppercut',speaker:'Luca',text:'Rimasi vicino e provai a interrompere il movimento prima che il montante arrivasse a bersaglio.',next:32},
+{img:'idle',speaker:'Mika',text:'Mika riprese fiato e sistemò la guardia. «Non è facile starmi davanti, vero?»',next:33},
+{img:'uppercut',speaker:'Mika',text:'Mika trovò di nuovo lo spazio e fece partire il montante prima che riuscissi a spostarmi completamente.',next:34},
+{img:'down',speaker:'Luca',text:'Il colpo mi sorprese. Persi l’equilibrio e finii a terra. Per un attimo sentii soltanto il rumore dei passi intorno al ring.',next:35},
+{img:'down',speaker:'Mika',text:'Mika fece un passo verso di me, preoccupata. «Stai bene?» Poi tornò al suo angolo del ring e aspettò che mi rialzassi.',next:36},
+{img:'getup',speaker:'Luca',text:'Appoggiai una mano a terra e mi rialzai. Il gong non era ancora suonato.',next:37},
+{img:'getup',speaker:'Mika',text:'«Sei riuscito a rialzarti.» Mika abbassò per un istante i guantoni. «Allora continuiamo.»',next:38},
+{img:'idle',speaker:'Luca',text:'Tornai in guardia. Il colpo mi aveva ricordato che bastava un errore per cambiare l’andamento dell’incontro.',next:39},
+{img:'idle',speaker:'Mika',text:'«Manca poco.» Mika respirò profondamente. «Voglio arrivare alla campanella senza rimpianti.»',choices:[['Prendi il centro del ring',40],['Resta prudente e aspetta',41],['«Non pensare che quel colpo sia bastato.»',42]]},
+{img:'attack1',speaker:'Luca',text:'Avanzai e ripresi il centro del ring. Mika arretrò di un passo, poi tornò subito avanti senza abbassare la guardia.',next:43},
+{img:'idle',speaker:'Luca',text:'Rimasi prudente. Dopo essere finito a terra non avevo intenzione di regalare a Mika un’altra occasione.',next:43},
+{img:'idle',speaker:'Mika',text:'Mika mi sostenne lo sguardo. «Non lo penso. Però adesso so che posso colpirti.»',next:43},
+{img:'idle',speaker:'Luca',text:'Il gong suonò. Mika abbassò lentamente i guantoni e tornò verso il suo angolo. Il primo round era finito.',next:44},
+{img:'idle',speaker:'Mika',text:'Seduta all’angolo, Mika prese fiato. Poco prima non era nemmeno sicura di voler salire sul ring. Ora, invece, guardava la campanella aspettando il momento di tornare a combattere.',next:45},
+{img:'pause',speaker:'Luca',text:'Nel mio angolo rimasi in silenzio per qualche secondo. Avevo affrontato avversari molto più esperti di Mika, ma quella ragazza era riuscita comunque a sorprendermi.',next:46},
+{img:'pause',speaker:'Mika',text:'«La prossima volta proverò a essere più veloce.» Mika si alzò lentamente dalla sedia. Il secondo round non era ancora iniziato.',choices:[['Continua',47]]},
+{img:'pause',speaker:'Luca',text:'La palestra tornò per qualche istante silenziosa. Poi qualcuno richiamò i due pugili verso il ring.',choices:[['Continua',48]]},
+{img:'idle',speaker:'Mika',text:'Mika tornò verso il ring. Aveva ancora paura, ma ormai quella paura non le impediva più di andare avanti.',choices:[['Continua',49]]},
+{img:'idle',speaker:'Luca',text:'Il secondo round stava per iniziare.',choices:[['Continua la demo',()=>location.reload()]]}
 ];
 
 function render(i){
- index=i;
  const s=story[i];
  scene.src=imgs[s.img];
  nameEl.textContent=s.speaker;
@@ -122,23 +124,24 @@ function render(i){
  roundEl.style.display=(s.img==='intro'||s.img==='pause')?'none':'block';
  continueBtn.style.display='none';
  if(s.choices){
-   s.choices.forEach(([label,target])=>{
-     const b=document.createElement('button');
-     b.className='choice'; b.type='button'; b.textContent=label;
-     b.addEventListener('click',()=>{
-       if(typeof target==='function'){target();return;}
-       render(target);
-     });
-     choicesEl.appendChild(b);
-   });
+  s.choices.forEach(([label,target])=>{
+   const b=document.createElement('button');
+   b.className='choice';
+   b.type='button';
+   b.textContent=label;
+   b.addEventListener('click',()=>typeof target==='function'?target():render(target));
+   choicesEl.appendChild(b);
+  });
  }else if(s.next!==undefined){
-   continueBtn.style.display='block';
-   continueBtn.onclick=()=>render(s.next);
+  continueBtn.style.display='block';
+  continueBtn.onclick=()=>render(s.next);
  }
 }
 
-function begin(){start.classList.add('hidden');render(0)}
-startButton.addEventListener('click',begin);
+startButton.addEventListener('click',()=>{
+ start.classList.add('hidden');
+ render(0);
+});
 </script>
 </body>
 </html>

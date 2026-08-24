@@ -1,251 +1,370 @@
-<!doctype html>
-<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>Visual Novel</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#g{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden;background:#111}#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}#shade{position:absolute;inset:0;background:linear-gradient(transparent 34%,rgba(0,0,0,.78));pointer-events:none}#ui{position:absolute;left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));background:rgba(7,8,12,.92);border-radius:14px;padding:13px;z-index:2;max-height:48%;overflow:auto}#who{font-weight:800;color:#ffd5df;margin-bottom:6px}#tx{white-space:pre-line;line-height:1.52;font-size:15px}.ch{display:grid;gap:8px;margin-top:12px}.ch button{border:0;border-radius:10px;padding:11px;background:#f1f2f4;color:#1678c8;font-weight:700;font-size:14px;min-height:42px}#start{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.12);z-index:5}#start button{border:0;border-radius:12px;padding:14px 22px;background:#f1f2f4;color:#1678c8;font-size:17px;font-weight:700}</style></head><body><div id="g"><img id="bg"><div id="shade"></div><div id="ui"><div id="who"></div><div id="tx"></div><div id="choices" class="ch"></div></div><div id="start"><button onclick="begin()">Inizia la demo</button></div></div><script>
-const raw={
-intro:'Intro .PNG',gloves:'Gloves.PNG',idle:'Idle.PNG',ring:'Ring.PNG',a1:'Attacco 1.PNG',a2:'Attacco 2.PNG',a3:'Attacco 3.PNG',down:'A terra .PNG',r2:'Inizio 2 round.PNG',pause:'Pausa.PNG',watch:'La ragazza vede il nostro stato.PNG',watchP:'La ragazza vede il nostro stato (provocatoria).PNG',hit:'Colpo stordente .PNG',hitP:'Colpo stordente (provocatoria).PNG',upper:'Montante.PNG',stun:'Svenimento.PNG',ko:'Ko.PNG',koP:'Ko (provocazione).PNG',fallT:'Caduta tra le gambe della ragazza.PNG',fallP:'Caduta tra le gambe della ragazza (provocazione).PNG',koT:'Ko.PNG',koTP:'Ko (provocazione).PNG',count:'La ragazza attende il conteggio (timida).PNG',countP:'La ragazza attende il conteggio (provocatoria).PNG',winT:'Posa della vittoria (timida).PNG',winP:'Posa della vittoria (provocatoria).PNG',near:'La ragazza che si avvicina a noi (finale timido).PNG',look:'La ragazza ci guarda dall’alto in basso (finale provocatorio).PNG',footT:'Piede poggiato (finale timido).PNG',footP:'Piede poggiato (finale provocatorio).PNG',sitT:'La ragazza che ci guarda in che stato siamo (finale timido).PNG',sitP:'Provocazione umiliante (finale provocatorio).PNG',selfT:'Selfie vittoria (timido).PNG',selfP:'Selfie vittoria (provocatorio).PNG',photoT:'Posa della foto (finale timido).PNG',photoT2:'Posa della foto2 (finale timido .PNG',photoP:'Posa della foto (finale provocatorio).PNG',exit:'Uscita dal ring.PNG',stats:'Risultati.PNG',phone:'Epilogo ragazza.PNG'};
-const A={};Object.keys(raw).forEach(k=>A[k]=encodeURI(raw[k]));const bg=document.querySelector('#bg'),who=document.querySelector('#who'),tx=document.querySelector('#tx'),cs=document.querySelector('#choices'),start=document.querySelector('#start');let score=0,prov=0;
-function S(im,n,t,opts=[]){bg.src=A[im]||A.idle;who.textContent=n;tx.textContent=t;cs.innerHTML='';opts.forEach(o=>{const b=document.createElement('button');b.textContent=o[0];b.onclick=o[1];cs.appendChild(b)})}function C(label,fn,dp=0,ds=0){return[label,()=>{prov+=dp;score+=ds;fn()}]}
-function begin(){start.style.display='none';S('intro','Mika',`Mika ha diciotto anni. È una ragazza normale, timida e senza esperienza nella boxe. Non ha mai pensato di poter salire su un ring contro un professionista.
-
-Ha accettato questo incontro per il premio in denaro. Aveva bisogno di quei soldi e pensava che sarebbe stato un incontro alla sua portata. Solo quando arriva scopre chi sarà il suo avversario.
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Visual Novel</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#08090d;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#g{position:relative;width:100%;height:100dvh;max-width:900px;margin:auto;overflow:hidden}#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}#shade{position:absolute;inset:0;background:linear-gradient(transparent 34%,rgba(0,0,0,.8));pointer-events:none}#ui{position:absolute;left:12px;right:12px;bottom:10px;background:rgba(7,8,12,.92);border-radius:14px;padding:13px;z-index:2;max-height:50%;overflow:auto}#who{font-weight:800;color:#ffd5df;margin-bottom:6px}#tx{white-space:pre-line;line-height:1.55;font-size:15px}.ch{display:grid;gap:8px;margin-top:12px}.ch button{border:0;border-radius:10px;padding:11px;background:#f1f2f4;color:#1678c8;font-weight:700;font-size:14px;min-height:42px}#start{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.12);z-index:5}#start button{border:0;border-radius:12px;padding:14px 22px;background:#f1f2f4;color:#1678c8;font-size:17px;font-weight:700}</style></head><body><div id="g"><img id="bg"><div id="shade"></div><div id="ui"><div id="who"></div><div id="tx"></div><div id="choices" class="ch"></div></div><div id="start"><button onclick="begin()">Inizia la demo</button></div></div><script>
+const R={intro:'Intro .PNG',idle:'Idle.PNG',ring:'Ring.PNG',a1:'Attacco 1.PNG',a2:'Attacco 2.PNG',a3:'Attacco 3.PNG',upper:'Montante.PNG',r2:'Inizio 2 round.PNG',pause:'Pausa.PNG',watch:'La ragazza vede il nostro stato.PNG',watchP:'La ragazza vede il nostro stato (provocatoria).PNG',hit:'Colpo stordente .PNG',hitP:'Colpo stordente (provocatoria).PNG',stun:'Svenimento.PNG',down:'A terra .PNG',ko:'Ko.PNG',koP:'Ko (provocazione).PNG',fallT:'Caduta tra le gambe della ragazza.PNG',fallP:'Caduta tra le gambe della ragazza (provocazione).PNG',count:'La ragazza attende il conteggio (timida).PNG',countP:'La ragazza attende il conteggio (provocatoria).PNG',winT:'Posa della vittoria (timida).PNG',winP:'Posa della vittoria (provocatoria).PNG',near:'La ragazza che si avvicina a noi (finale timido).PNG',look:'La ragazza ci guarda dall’alto in basso (finale provocatorio).PNG',footT:'Piede poggiato (finale timido).PNG',footP:'Piede poggiato (finale provocatorio).PNG',sitT:'La ragazza che ci guarda in che stato siamo (finale timido).PNG',sitP:'Provocazione umiliante (finale provocatorio).PNG',selfT:'Selfie vittoria (timido).PNG',selfP:'Selfie vittoria (provocatorio).PNG',photoT:'Posa della foto (finale timido).PNG',photoT2:'Posa della foto2 (finale timido .PNG',photoP:'Posa della foto (finale provocatorio).PNG',exit:'Uscita dal ring.PNG',stats:'Risultati.PNG',phone:'Epilogo ragazza.PNG'};const A={};for(const k in R)A[k]=encodeURI(R[k]);const bg=document.querySelector('#bg'),who=document.querySelector('#who'),tx=document.querySelector('#tx'),cs=document.querySelector('#choices'),start=document.querySelector('#start');let prov=0;
+function S(i,n,t,o=[]){bg.src=A[i]||A.idle;who.textContent=n;tx.textContent=t;cs.innerHTML='';o.forEach(x=>{let b=document.createElement('button');b.textContent=x[0];b.onclick=x[1];cs.appendChild(b)})}function Q(l,f,p=0){return[l,()=>{prov+=p;f()}]}
+function begin(){start.style.display='none';S('intro','Mika',`Mika ha diciotto anni. È timida, non ha esperienza nella boxe e non ha mai pensato di affrontare un professionista. Ha accettato l'incontro per il premio in denaro: ne ha bisogno e credeva di poter affrontare un avversario alla sua portata. Solo arrivata sul posto scopre chi ha davanti.
 
 Io.
 
 Un pugile professionista.
 
-Mika stringe i guantoni. È nervosa, ma non scappa. Fa un respiro profondo e cerca di convincersi che può farcela.`,[[`La osservo senza dire nulla.`,r1],[`Le concedo qualche secondo per prepararsi.`,r1],[`Cerco subito di metterle pressione.`,r1]])}
-function r1(){S('ring','Luca',`Il gong dà inizio al combattimento.
+Mika stringe i guantoni. È nervosa, ma non si tira indietro. Cerca di respirare lentamente e di convincersi che, almeno, può provarci.`,[[`La osservo in silenzio.`,r1],[`Le lascio qualche secondo.`,r1],[`Cerco subito di metterle pressione.`,r1]])}
+function r1(){S('ring','Luca',`Il gong suona. Mika parte cauta. La sua guardia è incerta, i movimenti sono quelli di una ragazza che sta imparando mentre combatte. Io controllo il centro e il primo round sembra andare come previsto.
 
-Mika parte con cautela. La sua guardia è ancora incerta e i suoi movimenti sono quelli di chi sta imparando mentre combatte. Io controllo il centro del ring e per buona parte del primo round faccio esattamente quello che dovrebbe fare un professionista.
+Eppure noto che dopo ogni scambio lei mi osserva, come se cercasse di capire qualcosa.`,[[`Continua il round.`,idle1]])}function idle1(){S('idle','Mika',`Mika respira profondamente.
 
-Eppure noto qualcosa: dopo ogni scambio Mika mi osserva. Non sembra cercare soltanto di sopravvivere. Sta imparando.`,[[`Il round continua.`,r1b]])}function r1b(){S('idle','Luca',`Il ritmo rallenta. Mika respira profondamente e rimane in guardia.
+«Sei molto più sicuro di me…» ammette piano. «Ma voglio almeno riuscire a restare in piedi.»
 
-«Non sei come mi aspettavo…» dice piano.
+Non c'è arroganza. È soltanto sincera.
 
-Non capisco se sia un complimento o se stia semplicemente cercando di parlare per calmarsi.
+*Perché continua a guardarmi così?*`,[[`Aspetto il gong.`,pause1]])}function pause1(){S('pause','Mika',`Durante la pausa Mika beve e abbassa lo sguardo per qualche secondo. È stanca, ma non sembra più terrorizzata.
 
-*Per ora non importa. Sono io il professionista.*`,[[`Aspetto il gong.`,pause1]])}function pause1(){S('pause','Mika',`Durante la pausa Mika beve e cerca di recuperare il fiato.
+«Posso farcela…» mormora a se stessa.
 
-Non parla molto. Quando torna a guardarmi, però, il suo sguardo è diverso: meno spaventato.`,[[`Il secondo round comincia.`,r2]])}
-function r2(){S('r2','Luca',`Il secondo round comincia.
-
-Il mio respiro è più pesante. Mika lo nota quasi subito.
+Poi torna a guardarmi. Questa volta non distoglie subito gli occhi.`,[[`Inizia il secondo round.`,r2]])}
+function r2(){S('r2','Luca',`Il secondo round comincia. Il fiato è più pesante. Mika lo nota quasi subito.
 
 *È una principiante. Non può essere lei a dettare il ritmo.*
 
-Faccio un passo avanti. Lei non arretra.`,[C(`Prendo il centro e la costringo ad arretrare.`,p1,1,1),C(`Aspetto che sia lei a venire avanti.`,p2,1,0),C(`Cambio ritmo e provo a sorprenderla.`,p3,0,2)])}
-function p1(){S('watch','Mika',`Mika arretra di mezzo passo. Poi mi guarda.
+Faccio un passo avanti. Lei non arretra.`,[Q(`Prendo il centro e la costringo ad arretrare.`,p1,1),Q(`Aspetto che sia lei a venire avanti.`,p2,1),Q(`Cambio ritmo e provo a sorprenderla.`,p3,0)])}
+function p1(){S('watch','Mika',`Mika arretra di mezzo passo, poi mi guarda.
 
 «Sei stanco?»
 
-La domanda è timida, quasi si vergognasse di averla fatta.
+La domanda è quasi gentile. Lei stessa sembra pentirsi di averla fatta.
 
-*Se se n'è accorta, è un problema.*
-
-Lei rialza la guardia.`,[[`«Concentrati su di te.»`,m1],[`Non rispondo.`,m1],[`«Non pensare di aver capito tutto.»`,m1]])}function p2(){S('watch','Mika',`Mika entra nella distanza e si ferma.
+*Se se n'è accorta, è un problema.*`,[[`«Concentrati su di te.»`,m1],[`Non rispondo.`,m1],[`«Non pensare di aver capito tutto.»`,m1]])}function p2(){S('watch','Mika',`Mika entra nella distanza e si ferma.
 
 «Prima sembravi molto più sicuro.»
 
-Non c'è arroganza nella sua voce. È soltanto un'osservazione.
+La frase non è provocatoria. È soltanto un'osservazione che mi pesa.
 
-*Ed è proprio questo che mi irrita.*`,[[`«Ti stai illudendo.»`,m1],[`Resto in guardia.`,m1],[`«Continua a provare.»`,m1]])}function p3(){S('idle','Luca',`Cambio ritmo. Per un attimo penso di averla sorpresa. Mika però legge il movimento e si sposta.
+*Non dovrebbe essere lei a dirmi una cosa del genere.*`,[[`«Ti stai illudendo.»`,m1],[`Resto in guardia.`,m1],[`«Continua a provare.»`,m1]])}function p3(){S('idle','Luca',`Cambio ritmo. Per un istante penso di averla sorpresa, ma Mika si sposta.
 
 «Stavi cercando di farmi sbagliare?»
 
-*Non dovrebbe essere lei a farmi domande del genere.*`,[[`Riparto subito.`,m1],[`Osservo la sua guardia.`,m1],[`«Vieni avanti.»`,m1]])}
+*Il problema è che adesso mi sta leggendo.*`,[[`Riparto subito.`,m1],[`Osservo la sua guardia.`,m1],[`«Vieni avanti.»`,m1]])}
 function m1(){S('idle','Mika',`Per alcuni secondi rimaniamo fermi.
 
-Mika inspira.
-
-«All'inizio pensavo solo a non farmi male.»
-
-Fa un passo.
-
-«Adesso penso che posso davvero combattere.»
+«All'inizio pensavo solo a non farmi male.» Mika inspira. «Adesso penso che posso davvero combattere.»
 
 *Una ragazza senza esperienza mi sta dicendo che crede di poter vincere.*
 
-Il pensiero mi pesa più di un colpo.`,[C(`Le lascio l'iniziativa.`,h1,1,-1),C(`Aspetto il suo errore.`,h2,1,-1),C(`Entro prima che possa partire.`,h3,0,2)])}
-function h1(){S('a1','Mika',`Mika parte. Il primo attacco arriva sulla mia guardia e mi costringe ad arretrare.
+Il pensiero mi pesa più di un colpo.`,[Q(`Le lascio l'iniziativa.`,h1,1),Q(`Aspetto il suo errore.`,h2,1),Q(`Entro prima che possa partire.`,h3,0)])}
+function h1(){S('a1','Mika',`Mika parte. Il colpo arriva sulla mia guardia e mi costringe ad arretrare.
 
-«Ti ho fatto arretrare?»
+«Ti ho fatto arretrare?» chiede sorpresa.
 
-Il suo tono è quasi incredulo.
-
-*Non devo lasciarle capire quanto mi abbia sorpreso.*`,[[`Torno avanti.`,hnext],[`Mi chiudo.`,hnext],[`Faccio finta di nulla.`,hnext]])}function h2(){S('a2','Mika',`Aspetto troppo. Mika entra e il suo colpo mi raggiunge prima della mia risposta.
+*Non devo lasciarle capire quanto mi abbia colpito.*`,[[`Torno avanti.`,mid],[`Mi chiudo.`,mid],[`Faccio finta di nulla.`,mid]])}function h2(){S('a2','Mika',`Aspetto troppo. Mika entra e il suo pugno mi raggiunge prima della mia risposta.
 
 Il dolore è sopportabile.
 
 L'umiliazione molto meno.
 
-*Ho aspettato un errore che non è arrivato.*`,[[`Attacco subito.`,hnext],[`Arretro.`,hnext],[`Resto in guardia.`,hnext]])}function h3(){S('a3','Mika',`Entro prima che possa muoversi. Mika reagisce d'istinto e il suo colpo mi raggiunge.
+*Ho aspettato un errore che non è arrivato.*`,[[`Attacco subito.`,mid],[`Arretro.`,mid],[`Resto in guardia.`,mid]])}function h3(){S('a3','Mika',`Entro prima che possa muoversi. Mika reagisce d'istinto e il suo colpo mi raggiunge.
 
 Lei torna subito in guardia.
 
-«Scusa…»
+«Scusa… non volevo sorprenderti così.»
 
-*Non voglio le sue scuse.*`,[[`«Non scusarti.»`,hnext],[`Faccio spazio.`,hnext],[`Torno avanti.`,hnext]])}function hnext(){S(prov>=2?'watchP':'watch','Luca',`Il combattimento continua.
-
-Più passa il tempo, più diventa difficile ignorare la realtà: sto facendo fatica contro una ragazza che, prima di stasera, non aveva esperienza.
+*Non voglio le sue scuse.*`,[[`«Non scusarti.»`,mid],[`Faccio spazio.`,mid],[`Torno avanti.`,mid]])}
+function mid(){S(prov>=2?'watchP':'watch','Luca',`Il combattimento continua. Più passa il tempo, più diventa difficile ignorare la realtà: sto facendo fatica contro una ragazza che, prima di stasera, non aveva esperienza.
 
 *Se perdo, non sarà una semplice sconfitta. Sono un professionista. Lei è salita qui senza sapere nemmeno cosa aspettarsi.*
 
-Mika mi guarda. La sua timidezza è ancora lì, ma adesso è accompagnata dalla sicurezza di chi ha capito di poter reggere il confronto.`,[C(`La provoco per farle perdere la calma.`,branchP,2,-1),C(`Resto prudente e cerco di non cedere.`,branchT,1,0),C(`Forzo uno scambio rischioso.`,branchA,0,2)])}
-function branchP(){S('watchP','Mika',`La provoco.
-
-Mika stringe i guantoni.
+Mika mi guarda. La sua timidezza è ancora lì, ma ora c'è sicurezza.`,[Q(`La provoco per farle perdere la calma.`,branchP,2),Q(`Resto prudente.`,branchT,1),Q(`Forzo uno scambio rischioso.`,branchA,0)])}
+function branchP(){S('watchP','Mika',`La provoco. Mika stringe i guantoni.
 
 «Pensavi che sarei scappata?»
 
-La voce è più ferma. La timidezza non è scomparsa, ma sotto di essa compare un atteggiamento più sicuro.
+La voce è più ferma. La timidezza non è sparita, ma ora sotto c'è un atteggiamento più sicuro.
 
-*Ho spinto troppo. E adesso lei vuole dimostrarmi qualcosa.*`,[[`Continuo a provocarla.`,fightP],[`Smetto di parlare.`,fightP],[`Cerco di chiudere lo scambio.`,fightP]])}function branchT(){S('watch','Mika',`Resto prudente.
-
-Mika non sorride. Mi studia e continua a muoversi con attenzione.
+*Ho spinto troppo. Adesso vuole dimostrarmi qualcosa.*`,[[`Continuo a provocarla.`,fightP],[`Smetto di parlare.`,fightP],[`Cerco di chiudere lo scambio.`,fightP]])}function branchT(){S('watch','Mika',`Resto prudente. Mika non sorride. Mi studia.
 
 «Non voglio farti male…» dice piano.
 
-*È quasi peggio. Non voglio la sua gentilezza. Voglio soltanto tornare a essere quello che controlla l'incontro.*`,[[`Avanzo.`,fightT],[`Aspetto.`,fightT],[`Cambio angolo.`,fightT]])}function branchA(){S('hit','Mika',`Forzo uno scambio. Mika assorbe il colpo, ma riesce a rispondere.
+*È quasi peggio. Non voglio la sua gentilezza. Voglio tornare a essere quello che controlla l'incontro.*`,[[`Avanzo.`,fightT],[`Aspetto.`,fightT],[`Cambio angolo.`,fightT]])}function branchA(){S('hit','Mika',`Forzo uno scambio. Mika riesce a rispondere.
 
 Il fiato mi manca per un istante.
 
 «Non sei invincibile…» mormora.
 
 *Questa volta l'ho sentita.*`,[[`Continuo.`,fightT],[`Mi copro.`,fightT],[`Arretro.`,fightT]])}
-function fightT(){S('upper','Luca',`Mika avanza. Io provo a rispondere, ma il suo montante arriva prima.
+function fightT(){S('upper','Luca',`Mika avanza. Provo a rispondere, ma il suo montante arriva prima.
 
 La testa si sposta all'indietro.
 
 *Non può finire così.*
 
-Cerco di rimettere insieme la guardia.`,[[`Resisto e continuo.`,finish],[`Aspetto il suo prossimo attacco.`,finish],[`Provo a recuperare il fiato.`,finish]])}function fightP(){S('hitP','Mika',`Mika avanza senza più esitare.
+Cerco di rimettere insieme la guardia.`,[[`Resisto e continuo.`,finishT],[`Aspetto il prossimo attacco.`,finishT],[`Provo a recuperare il fiato.`,finishT]])}function fightP(){S('hitP','Mika',`Mika avanza senza più esitare.
 
 «Adesso tocca a me.»
 
-Il suo colpo mi raggiunge e mi fa perdere equilibrio.
+Il colpo mi raggiunge e perdo equilibrio.
 
 *La ragazza che all'inizio non riusciva nemmeno a guardarmi negli occhi sta combattendo come se fosse lei quella sicura di vincere.*`,[[`Cerco di restare in piedi.`,finishP],[`La provoco ancora.`,finishP],[`Mi copro.`,finishP]])}
-function finish(){S('stun','Luca',`Le gambe diventano pesanti. Il rumore intorno a me sembra lontanissimo.
+function finishT(){S('stun','Luca',`Le gambe diventano pesanti. Il rumore intorno a me sembra lontanissimo.
 
 Mika si avvicina e si ferma.
 
 «Ehi… tutto bene?»
 
-La domanda è sincera.
+La domanda è sincera. Non voglio la sua compassione.
 
-*Non voglio la sua compassione. Non dopo tutto quello che ho costruito come professionista.*
+*Non dopo tutto quello che ho costruito come professionista.*`,[Q(`Gioco tutto sull'attacco.`,win,0),Q(`Aspetto il contrattacco.`,loseT,1),Q(`Provo soltanto a resistere.`,loseT,1)])}function finishP(){S('down','Luca',`Il mio equilibrio peggiora. Mika vede in che stato sono ridotto.
 
-Cerco di sollevare la guardia.`,[C(`Gioco tutto sull'attacco.`,ourWin,0,4),C(`Aspetto il contrattacco.`,loseTim,1,0),C(`Provo soltanto a resistere.`,loseTim,1,-1)])}function finishP(){S('down','Luca',`Il mio equilibrio peggiora.
-
-Mika vede in che stato sono ridotto. Per un attimo sembra sorpresa persino lei.
+Per un attimo sembra sorpresa persino lei.
 
 Poi torna in guardia.
 
-*Una principiante. Sto davvero perdendo contro una principiante.*`,[C(`Cerco un ultimo attacco.`,ourWin,0,4),C(`Aspetto che si avvicini.`,loseProv,2,0),C(`Mi copro e provo a resistere.`,loseProv,1,-1)])}
-function ourWin(){S('idle','Luca',`Trovo finalmente un'apertura e riesco a chiudere lo scambio.
+*Una principiante. Sto davvero perdendo contro una principiante.*`,[Q(`Cerco un ultimo attacco.`,win,0),Q(`Aspetto che si avvicini.`,loseP,2),Q(`Mi copro e provo a resistere.`,loseP,1)])}
+function win(){S('idle','Luca',`Trovo finalmente un'apertura. Riesco a chiudere lo scambio e Mika arretra.
 
-Mika arretra. Il gong suona.
+Il gong suona.
 
 Sono ancora in piedi.
 
-La demo si conclude qui per il nostro finale, perché non abbiamo un'immagine dedicata alla nostra vittoria.`,[[`Continua.`,statsWin]])}
-function loseTim(){S('hit','Mika',`Mika approfitta dell'esitazione.
+La demo della nostra vittoria termina qui, perché non abbiamo un'immagine dedicata alla vittoria del protagonista.`,[[`Continua.`,statsWin]])}function statsWin(){S('stats','Statistiche',`Statistiche dell'incontro.
 
-Il colpo arriva pulito. La mia coscienza comincia a svanire.
+Vittoria di Luca.`,[[`Fine demo`,()=>{}]])}
+function loseT(){S('hit','Mika',`Mika approfitta della mia esitazione. Il colpo arriva pulito.
 
-*No… non davanti a lei.*`,[[`Continua.`,fallTim]])}function loseProv(){S('hitP','Mika',`Mika approfitta della mia esitazione.
+La mia coscienza comincia a svanire.
 
-Il colpo arriva e la coscienza comincia a svanire.
+*No… non davanti a lei.*`,[[`Continua.`,koT]])}function loseP(){S('hitP','Mika',`Mika avanza ancora.
 
-«Non mollare adesso…» dice con un sorriso sicuro.`,[[`Continua.`,fallProv]])}
-function fallTim(){S('stun','Luca',`Barcollo. Cerco di trovare il ring con i piedi, ma non ci riesco.
+«Guardami.»
 
-Il corpo non risponde più.
+Il colpo arriva e la mia coscienza vacilla.
 
-Mika fa un passo verso di me.`,[[`Continuo.`,()=>S('fallT','Mika',`Cado a terra, privo di sensi. Mika rimane immobile per un istante, sorpresa da quanto rapidamente sia finito tutto.`,[[`Continua.`,koTim]])]])}function fallProv(){S('stun','Luca',`Barcollo. La vista si appanna.
+*Non riesco più a reagire.*`,[[`Continua.`,koP]])}
+function koT(){S('ko','Mika',`Il mondo diventa confuso. Le gambe cedono e non riesco più a seguire il combattimento.
 
-Mika si avvicina.
+Mika resta immobile per un momento. Guarda il mio corpo a terra e sbatte le palpebre, come se non riuscisse a credere a ciò che è appena successo.
 
-Il ring sparisce dalla mia percezione.`,[[`Continuo.`,()=>S('fallP','Mika',`Cado a terra tra le sue gambe, completamente privo di sensi.
+«Aspetta… è davvero finita?»
 
-Mika mi guarda e questa volta non sembra più intimidita.`,[[`Continua.`,koProv]])]])}function koTim(){S('ko','Mika',`Rimango a terra. Mika mi guarda, ancora stupita.
+*L'ho battuto davvero?* pensa. *Lui era il professionista. Io non sapevo nemmeno se sarei riuscita a stare in piedi.*
 
-Il conteggio comincia.
+Mika abbassa lentamente i guantoni. Non esulta. La sua prima reazione è preoccuparsi.
 
-Lei non festeggia. Sembra quasi dispiaciuta che sia finita in questo modo.`,[[`Continua.`,countTim]])}function koProv(){S('koP','Mika',`Rimango a terra. Mika mi guarda dall'alto.
+«Ehi… mi senti?» chiede piano.
 
-Il conteggio comincia.
+Si avvicina di qualche passo, ancora incerta se toccarmi o chiamare qualcuno.
 
-Questa volta sul suo volto c'è soddisfazione.`,[[`Continua.`,countProv]])}function countTim(){S('count','Mika',`Mika aspetta il conteggio.
+«Mi dispiace… non volevo che finisse così.»
 
-«L'ho davvero battuto…?»
+Poi guarda il ring e torna a guardarmi.
 
-Quando arriva l'ultimo numero, abbassa lentamente i guantoni.`,[[`Continua.`,victTim]])}function countProv(){S('countP','Mika',`Mika aspetta il conteggio senza distogliere lo sguardo.
+«Però… ho vinto.»
 
-Quando arriva l'ultimo numero sorride.
+La frase le esce quasi sottovoce. Un sorriso incredulo compare sul suo volto e subito cerca di nasconderlo.`,[[`Continua.`,countT]])}
+function koP(){S('koP','Mika',`Il mondo si allontana. Le gambe cedono e non riesco più a reagire.
 
-«Quindi era davvero possibile.»`,[[`Continua.`,victProv]])}
-function victTim(){S('winT','Mika',`La vittoria la rende quasi imbarazzata.
+Mika resta a guardarmi per qualche secondo.
 
-«Non pensavo di farcela.»
+La sorpresa iniziale lascia lentamente spazio a un sorriso.
 
-Non c'è superiorità. Solo la sorpresa di aver sconfitto un professionista.`,[[`Continua.`,nearTim]])}function victProv(){S('winP','Mika',`Mika posa con sicurezza.
+*Quindi era questo il professionista di cui avevo paura?* pensa.
+
+«Non riesci più a rialzarti?» dice, quasi incredula.
+
+La sua voce non è più quella timida dell'inizio.
+
+Mika guarda il mio stato, poi il pubblico e infine torna a guardare me.
+
+«Alla fine sei caduto davvero.»
+
+Fa un passo avanti. «E pensare che ero terrorizzata prima del gong.»
+
+Per la prima volta sembra divertirsi apertamente della situazione.`,[[`Continua.`,countP]])}
+function countT(){S('count','Mika',`Mika aspetta il conteggio senza festeggiare.
+
+Quando il conteggio procede, continua a guardarmi. Dentro di lei è ancora incredula.
+
+*Non riesco a crederci. Una settimana fa non sapevo nemmeno come si mettevano i guantoni correttamente. E adesso ho battuto un professionista.*
+
+«Forza…» mormora. «Spero che tu stia bene.»
+
+Quando arriva la fine del conteggio, Mika abbassa gli occhi.
+
+«Ho davvero vinto.»
+
+Sorride appena, quasi imbarazzata dalla propria felicità.`,[[`Continua.`,victT]])}function countP(){S('countP','Mika',`Mika aspetta il conteggio senza distogliere lo sguardo.
+
+*È incredibile. All'inizio aveva tutta quella sicurezza. Adesso è a terra e sono io a essere rimasta in piedi.*
+
+Quando il conteggio finisce, Mika sorride.
+
+«Quindi è finita davvero.»
+
+Fa un piccolo gesto con i guantoni.
+
+«E pensare che all'inizio avevo paura di te.»`,[[`Continua.`,victP]])}
+function victT(){S('winT','Mika',`Mika alza lentamente i guantoni. Non riesce a esultare davvero.
+
+«Non pensavo di poterlo fare…»
+
+Respira profondamente e guarda verso di noi.
+
+*Non volevo umiliarlo. Volevo soltanto vincere.*
+
+Il sorriso che compare è sincero e ancora un po' timido.
+
+«Grazie per aver combattuto con me.»`,[[`Continua.`,nearT]])}function victP(){S('winP','Mika',`Mika alza i guantoni con un sorriso sicuro.
 
 «Alla fine sei stato tu a cadere.»
 
-La frase è tranquilla, ma non nasconde la soddisfazione.`,[[`Continua.`,nearProv]])}
-function nearTim(){S('near','Mika',`Mika si avvicina.
+Non alza la voce. Non ne ha bisogno.
 
-«Mi dispiace… davvero. Però grazie. Non pensavo di essere capace di una cosa simile.»`,[[`Continua.`,footTim]])}function nearProv(){S('look','Mika',`Mika ci guarda dall'alto in basso.
+*Adesso posso finalmente ammetterlo: sono orgogliosa di averlo battuto.*
 
-«La prossima volta non sottovalutare qualcuno solo perché è alla prima esperienza.»`,[[`Continua.`,footProv]])}function footTim(){S('footT','Mika',`Mika rimane accanto a noi. È ancora incredula per quello che è successo.`,[[`Continua.`,sitTim]])}function footProv(){S('footP','Mika',`Mika mantiene il suo atteggiamento sicuro.
+Guarda ancora verso di noi e sorride.`,[[`Continua.`,nearP]])}
+function nearT(){S('near','Mika',`Mika si avvicina lentamente.
 
-«È incredibile. Un professionista… e sei finito qui.»`,[[`Continua.`,sitProv]])}function sitTim(){S('sitT','Mika',`Mika si siede e ci guarda.
+La sicurezza che ha guadagnato sul ring non cancella la sua timidezza. Quando mi è vicino, abbassa lo sguardo.
 
-«Sei davvero un professionista… eppure ho vinto io.»`,[[`Continua.`,selfTim]])}function sitProv(){S('sitP','Mika',`Mika si siede e continua a guardarci.
+«Mi dispiace davvero.»
 
-«Stasera quello che non riusciva più a stare in piedi eri tu.»`,[[`Continua.`,selfProv]])}function selfTim(){S('selfT','Mika',`Mika scatta un selfie.
+Fa una pausa.
+
+«Quando sono salita sul ring avevo paura. Pensavo che mi avresti battuta in pochi minuti.»
+
+Sorride appena.
+
+«Invece… sono stata io a vincere.»
+
+*Non so nemmeno come sia successo. Ma è successo davvero.*`,[[`Continua.`,footT]])}function nearP(){S('look','Mika',`Mika si avvicina e ci guarda dall'alto in basso.
+
+«La prossima volta dovresti stare più attento a chi consideri una principiante.»
+
+Si ferma un momento, quasi assaporando la frase.
+
+«All'inizio avevi tutta quella sicurezza. Adesso non riesci nemmeno a rispondermi.»
+
+*Non avrei mai immaginato che sarebbe stato così soddisfacente.*`,[[`Continua.`,footP]])}
+function footT(){S('footT','Mika',`Mika guarda la situazione e resta in silenzio per qualche secondo.
+
+«È davvero strano vederti così.»
+
+Non c'è cattiveria nella sua voce.
+
+*Dovrei essere felice. Lo sono. Ma non voglio infierire.*
+
+Si allontana leggermente e sospira.`,[[`Continua.`,sitT]])}function footP(){S('footP','Mika',`Mika mantiene il suo sorriso sicuro.
+
+«Direi che la serata è andata molto diversamente da come pensavi.»
+
+Guarda il mio volto e poi torna a sorridere.
+
+«Un professionista sconfitto da una principiante. Non è una storia che dimenticherò facilmente.»`,[[`Continua.`,sitP]])}
+function sitT(){S('sitT','Mika',`Mika si siede e mi guarda in silenzio.
+
+«Sei davvero un professionista…» dice piano. «Eppure sono stata io a vincere.»
+
+Abbassa lo sguardo.
+
+*Forse domani mi sembrerà ancora impossibile.*
+
+«Spero che quando ti sveglierai non sarai troppo arrabbiato con me.»
+
+Sorride appena. «Io, comunque, questa vittoria non la dimenticherò.»`,[[`Continua.`,selfT]])}function sitP(){S('sitP','Mika',`Mika si siede e continua a guardarci.
+
+«Stasera sei stato tu quello che non è riuscito a stare in piedi.»
+
+Inclina appena la testa.
+
+«Eri così sicuro di te all'inizio.»
+
+*Vorrei vedere la sua faccia quando capirà davvero di aver perso contro di me.*
+
+«Adesso invece sei qui a terra.»`,[[`Continua.`,selfP]])}
+function selfT(){S('selfT','Mika',`Mika prende il telefono. Prima di scattare la foto esita.
+
+«È un po' imbarazzante…»
 
 Sorride timidamente.
 
-«Ancora non ci credo…»`,[[`Continua.`,photoTim]])}function selfProv(){S('selfP','Mika',`Mika scatta un selfie.
+*Non voglio sembrare arrogante. Ma questa è la prima volta che vinco qualcosa del genere.*
 
-Sorride senza nascondere la soddisfazione.
+Scatta il selfie.
 
-«Questa me la voglio ricordare.»`,[[`Continua.`,photoProv]])}function photoTim(){S('photoT','Mika',`Mika guarda la foto della vittoria e poi ne scatta un'altra.`,[[`Continua.`,photoTim2]])}function photoTim2(){S('photoT2','Mika',`Mika osserva la seconda foto.
+«Ancora non ci credo.»`,[[`Continua.`,photoT]])}function selfP(){S('selfP','Mika',`Mika prende il telefono e scatta un selfie senza esitazione.
 
-«Forse questa la tengo.»`,[[`Continua.`,exitEnd]])}function photoProv(){S('photoP','Mika',`Mika guarda la foto della vittoria e sorride.
+«Questa me la voglio ricordare.»
 
-«Sì. Questa va bene.»`,[[`Continua.`,exitEnd]])}function exitEnd(){S('exit','Mika',`Mika esce dal ring.
+Guarda lo schermo e sorride.
 
-La serata continua a sembrarle irreale. È entrata pensando di non avere possibilità e ne è uscita con una vittoria contro un professionista.`,[[`Continua.`,statsLose]])}function statsWin(){S('stats','Statistiche',`RISULTATI DELL'INCONTRO
+*Non capita tutti i giorni di battere un professionista.*
 
-Vittoria di Luca.
+«Questa foto non la cancello di sicuro.»`,[[`Continua.`,photoP]])}function photoT(){S('photoT','Mika',`Mika guarda la foto della vittoria.
 
-La demo termina qui perché non esiste ancora un'immagine dedicata alla nostra celebrazione della vittoria.`,[[`Fine demo.`,()=>{}]])}function statsLose(){S('stats','Statistiche',`RISULTATI DELL'INCONTRO
+«Forse questa la tengo solo per me.»
 
-Vittoria di Mika.
+Poi ne prepara un'altra, ancora con quel sorriso incredulo.
 
-Il risultato viene mostrato prima dell'epilogo.`,[[`Continua.`,phone]])}function phone(){S('phone','Mika',`Più tardi, a casa, Mika è al telefono con la sua amica.
+*È successo davvero.*`,[[`Continua.`,photoT2]])}function photoT2(){S('photoT2','Mika',`Mika guarda la seconda foto e sorride.
+
+«Non sembro nemmeno io.»
+
+La sua voce torna bassa.
+
+«Sono contenta di aver avuto il coraggio di salire su quel ring.»`,[[`Continua.`,exit]])}function photoP(){S('photoP','Mika',`Mika guarda la foto della vittoria e sorride.
+
+«Sì. Questa va bene.»
+
+La riguarda ancora una volta.
+
+*Questa è la prova che non era un sogno.*`,[[`Continua.`,exit]])}function exit(){S('exit','Mika',`Mika esce dal ring. Per qualche secondo guarda indietro.
+
+La serata che doveva essere soltanto un modo per guadagnare dei soldi è diventata qualcosa che ricorderà per molto tempo.
+
+Ha battuto un professionista.
+
+E, mentre lascia il ring, continua a chiedersi come sia riuscita a farlo.`,[[`Continua.`,stats]])}function stats(){S('stats','Statistiche',`Statistiche dell'incontro.
+
+Vittoria di Mika.`,[[`Continua.`,phone]])}function phone(){S('phone','Mika',`Più tardi, a casa, Mika è al telefono con la sua amica.
 
 «Non ci crederai mai. Ho davvero vinto.»
 
-Ascolta la risposta e ride piano.
+Ascolta la risposta e scoppia a ridere piano.
 
-«All'inizio avevo una paura tremenda. Poi però ho capito che potevo farcela.»
+«Sì, lo so. Anche a me sembra assurdo.»
 
-La telefonata continua ancora per qualche minuto. Mika ripensa al combattimento, al momento in cui ha smesso di sentirsi una principiante e ha capito di poter reggere il confronto.`,[[`Continua.`,hospital]])}function hospital(){bg.src='';who.textContent='';tx.textContent=`Quando riapro gli occhi, vedo un soffitto bianco.
+Si ferma un momento e guarda il telefono.
 
-Per qualche secondo non ricordo dove sono. Poi tornano il ring, il gong e l'ultimo colpo.
+«All'inizio ero terrorizzata. Era un professionista. Pensavo che non avrei avuto nessuna possibilità.»
+
+Ascolta ancora.
+
+«No, non sto scherzando. È successo davvero.»
+
+Il sorriso le torna sul volto.
+
+«Credo che domani mi sveglierò ancora pensando che sia stato un sogno.»`,[[`Continua.`,hospital]])}function hospital(){S('', '',`Lo schermo diventa nero.
+
+Quando riapro gli occhi, vedo un soffitto bianco.
+
+Per qualche secondo non ricordo dove sono. Poi la memoria torna lentamente: il ring, il gong, i colpi… e Mika davanti a me.
 
 Sono in ospedale.
 
-La parte più difficile non è il dolore. È ricordare contro chi ho perso.
+Mi dicono che ho perso conoscenza e che sono stato portato qui dopo l'incontro.
 
-Una principiante.
+Resto in silenzio.
 
-Una ragazza che era salita sul ring senza esperienza e che, alla fine, era rimasta in piedi mentre io non riuscivo più a farlo.
+*Una professionista? No. Una ragazza senza esperienza.*
 
-*Non dimenticherò facilmente questa notte.*
+Ripenso a quando l'avevo vista per la prima volta. Sembrava intimorita. Io ero convinto che l'incontro sarebbe stato semplice.
 
-FINE — SCONFITTA`;cs.innerHTML='';const b=document.createElement('button');b.textContent='Ricomincia';b.onclick=()=>location.reload();cs.appendChild(b)}
-S('idle','','');</script></body></html>
+Adesso è proprio quel ricordo a pesarmi di più.
+
+*Ho perso contro di lei.*
+
+Non è soltanto il dolore fisico. È sapere che, per tutta la durata dell'incontro, ho avuto davanti una ragazza che avrebbe dovuto essere la parte più inesperta del ring… e alla fine sono stato io a non riuscire più a stare in piedi.
+
+Chiudo gli occhi.
+
+*Non dimenticherò questa notte.*
+
+FINE`,[[`Ricomincia`,()=>location.reload()]])}
+</script></body></html>
